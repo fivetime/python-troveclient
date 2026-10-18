@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    ``openstack database instance create`` takes
+    ``--extended-properties <key=value,...>``, and ``instances.create`` an
+    ``extended_properties`` dict: what the instance is created with that its
+    datastore keeps for its life, for example ``sync_writes=true`` for a
+    Vertica instance.

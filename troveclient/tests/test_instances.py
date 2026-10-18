@@ -116,6 +116,16 @@ class InstancesTest(testtools.TestCase):
         self.assertEqual(4, b["instance"]["replica_count"])
         self.assertEqual('affinity', b["instance"]["locality"])
         self.assertEqual({'is_public': True}, b["instance"]["access"])
+        self.assertNotIn('extended_properties', b["instance"])
+
+    def test_create_extended_properties(self):
+        self.instances._create = mock.Mock(
+            side_effect=lambda path, body, inst: body)
+        b = self.instances.create(
+            "test-name", 103, {'size': 1},
+            extended_properties={'sync_writes': 'true'})
+        self.assertEqual({'sync_writes': 'true'},
+                         b["instance"]["extended_properties"])
 
     def test_list(self):
         page_mock = mock.Mock()

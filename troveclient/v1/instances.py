@@ -94,7 +94,8 @@ class Instances(base.ManagerWithFind):
                datastore=None, datastore_version=None, nics=None,
                configuration=None, replica_of=None, replica_count=None,
                modules=None, locality=None, region_name=None, access=None,
-               datastore_version_number=None, **kwargs):
+               datastore_version_number=None, extended_properties=None,
+               **kwargs):
         """Create (boot) a new instance."""
 
         body = {"instance": {
@@ -137,6 +138,8 @@ class Instances(base.ManagerWithFind):
             body["instance"]["region_name"] = region_name
         if access:
             body["instance"]["access"] = access
+        if extended_properties:
+            body["instance"]["extended_properties"] = extended_properties
 
         return self._create("/instances", body, "instance")
 

@@ -456,6 +456,30 @@ class TestDatabaseInstanceCreate(TestInstances):
         self.assertEqual(expected_values, data)
 
     @mock.patch.object(utils, 'find_resource')
+    def test_instance_create_extended_properties(self, mock_find):
+        args = ['test-name', '--flavor', '103', '--size', '1',
+                '--datastore', 'vertica', '--datastore-version', '25.4',
+                '--nic', 'net-id=net1',
+                '--extended-properties', 'sync_writes=true']
+        verifylist = [('extended_properties', 'sync_writes=true')]
+        parsed_args = self.check_parser(self.cmd, args, verifylist)
+        self.cmd.take_action(parsed_args)
+        self.assertEqual(
+            {'sync_writes': 'true'},
+            self.instance_client.create.call_args.kwargs[
+                'extended_properties'])
+
+    @mock.patch.object(utils, 'find_resource')
+    def test_instance_create_without_extended_properties(self, mock_find):
+        args = ['test-name', '--flavor', '103', '--size', '1',
+                '--nic', 'net-id=net1']
+        parsed_args = self.check_parser(self.cmd, args, [])
+        self.cmd.take_action(parsed_args)
+        self.assertIsNone(
+            self.instance_client.create.call_args.kwargs[
+                'extended_properties'])
+
+    @mock.patch.object(utils, 'find_resource')
     def test_instance_create_nic_param(self, mock_find):
         fake_id = self.random_uuid()
         mock_find.return_value.id = fake_id
@@ -491,7 +515,8 @@ class TestDatabaseInstanceCreate(TestInstances):
             modules=[],
             locality=None,
             region_name=None,
-            access={'is_public': False}
+            access={'is_public': False},
+            extended_properties=None
         )
 
     def test_instance_create_accepts_soft_locality(self):

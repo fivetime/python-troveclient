@@ -377,6 +377,16 @@ class CreateDatabaseInstance(command.ShowOne):
             help=argparse.SUPPRESS,
         )
         parser.add_argument(
+            '--extended-properties',
+            dest='extended_properties',
+            metavar='<key=value,key=value>',
+            default=None,
+            help=_("Extended properties of the instance, which its datastore "
+                   "keeps for its life. Vertica: sync_writes=<true|false>, "
+                   "whether every write reaches the disk before it "
+                   "returns."),
+        )
+        parser.add_argument(
             '--is-public',
             action='store_true',
             help="Whether or not to make the instance public.",
@@ -463,6 +473,11 @@ class CreateDatabaseInstance(command.ShowOne):
             modules.append(osc_utils.find_resource(database.modules,
                                                    module).id)
 
+        extended_properties = None
+        if parsed_args.extended_properties:
+            extended_properties = v1_shell._parse_extended_properties(
+                parsed_args.extended_properties)
+
         access = {'is_public': False}
         if parsed_args.is_public:
             access['is_public'] = True
@@ -487,7 +502,8 @@ class CreateDatabaseInstance(command.ShowOne):
             modules=modules,
             locality=locality,
             region_name=parsed_args.region,
-            access=access
+            access=access,
+            extended_properties=extended_properties
         )
         instance = set_attributes_for_print_detail(instance)
         return zip(*sorted(instance.items()))
