@@ -125,6 +125,16 @@ class ClustersTest(testtools.TestCase):
         resp.status_code = 500
         self.assertRaises(Exception, clusters_test.upgrade, 'cluster1', '5.6')
 
+    def test_reset_communal_credential(self):
+        resp = mock.Mock()
+        resp.status_code = 202
+        clusters_test = self.get_clusters()
+        clusters_test.api.client.post = mock.Mock(
+            return_value=(resp, {'cluster': {'id': 'cluster1'}}))
+        clusters_test.reset_communal_credential('cluster1')
+        clusters_test.api.client.post.assert_called_once_with(
+            '/clusters/cluster1', body={'reset_communal_credential': {}})
+
     def test_delete(self):
         resp = mock.Mock()
         resp.status_code = 200

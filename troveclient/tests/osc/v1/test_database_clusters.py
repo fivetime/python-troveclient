@@ -224,6 +224,22 @@ class TestDatabaseClusterUpgrade(TestClusters):
         self.assertIsNone(result)
 
 
+class TestDatabaseClusterResetCommunalCredential(TestClusters):
+
+    def setUp(self):
+        super(TestDatabaseClusterResetCommunalCredential, self).setUp()
+        self.cmd = database_clusters.ResetCommunalCredentialDatabaseCluster(
+            self.app, None)
+
+    @mock.patch.object(utils, 'find_resource')
+    def test_reset_communal_credential(self, mock_find):
+        mock_find.return_value = 'cluster1'
+        parsed_args = self.check_parser(self.cmd, ['cluster1'], [])
+        self.assertIsNone(self.cmd.take_action(parsed_args))
+        self.cluster_client.reset_communal_credential.assert_called_with(
+            'cluster1')
+
+
 class TestDatabaseClusterForceDelete(TestClusters):
 
     def setUp(self):

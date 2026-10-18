@@ -281,6 +281,29 @@ class UpgradeDatabaseCluster(command.Command):
         database_clusters.upgrade(cluster, parsed_args.datastore_version)
 
 
+class ResetCommunalCredentialDatabaseCluster(command.Command):
+
+    _description = _("Gives the communal storage of a cluster an EC2 "
+                     "credential of the current user, in place of the one "
+                     "it has (a Vertica cluster in Eon Mode).")
+
+    def get_parser(self, prog_name):
+        parser = super(ResetCommunalCredentialDatabaseCluster,
+                       self).get_parser(prog_name)
+        parser.add_argument(
+            'cluster',
+            metavar='<cluster>',
+            help=_('ID or name of the cluster.'),
+        )
+        return parser
+
+    def take_action(self, parsed_args):
+        database_clusters = self.app.client_manager.database.clusters
+        cluster = utils.find_resource(database_clusters,
+                                      parsed_args.cluster)
+        database_clusters.reset_communal_credential(cluster)
+
+
 class ForceDeleteDatabaseCluster(command.Command):
 
     _description = _("Force delete a cluster.")

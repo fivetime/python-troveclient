@@ -139,6 +139,16 @@ class Clusters(base.ManagerWithFind):
         body = {"upgrade": {'datastore_version': datastore_version}}
         return self._action(cluster, body)
 
+    def reset_communal_credential(self, cluster):
+        """Gives the communal storage of a cluster an EC2 credential of the
+        user asking, in place of the one it has (a Vertica cluster in Eon
+        Mode).
+
+        :param cluster:             The cluster
+        """
+        body = {"reset_communal_credential": {}}
+        return self._action(cluster, body)
+
 
 class ClusterStatus(object):
 
