@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    ``openstack database cluster show`` shows the health of the cluster the
+    server records (``health``, ``health_members_out``, ``health_reason``,
+    ``health_since``), and ``cluster list`` a ``Health`` column.

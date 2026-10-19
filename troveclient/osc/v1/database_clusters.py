@@ -34,6 +34,16 @@ def set_attributes_for_print_detail(cluster):
         info['task_description'] = cluster.task['description']
         info['task_name'] = cluster.task['name']
     info.pop('task', None)
+    # The health the server recorded, as lines of its own.
+    health = info.pop('health', None)
+    if health:
+        info['health'] = health.get('status')
+        if health.get('members_out'):
+            info['health_members_out'] = ', '.join(health['members_out'])
+        if health.get('reason'):
+            info['health_reason'] = health['reason']
+        if health.get('since'):
+            info['health_since'] = health['since']
     if hasattr(cluster, 'ip'):
         ip = []
         for addr in cluster.ip:
@@ -53,7 +63,7 @@ class ListDatabaseClusters(command.Lister):
 
     _description = _("List database clusters")
     columns = ['ID', 'Name', 'Datastore', 'Datastore Version',
-               'Task Name']
+               'Task Name', 'Health']
 
     def get_parser(self, prog_name):
         parser = super(ListDatabaseClusters, self).get_parser(prog_name)
@@ -86,6 +96,9 @@ class ListDatabaseClusters(command.Lister):
                     cluster.datastore['version'])
             setattr(cluster, 'datastore', cluster.datastore['type'])
             setattr(cluster, 'task_name', cluster.task['name'])
+            # A server older than the health of clusters has none.
+            setattr(cluster, 'health',
+                    (getattr(cluster, 'health', None) or {}).get('status'))
 
         clusters = [utils.get_item_properties(c, self.columns)
                     for c in clusters]

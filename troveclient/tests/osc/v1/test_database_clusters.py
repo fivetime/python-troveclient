@@ -38,7 +38,8 @@ class TestClusterList(TestClusters):
     }
 
     columns = database_clusters.ListDatabaseClusters.columns
-    values = ('cls-1234', 'test-clstr', 'vertica', '7.1', 'NONE')
+    # The fake cluster comes from a server without health.
+    values = ('cls-1234', 'test-clstr', 'vertica', '7.1', 'NONE', None)
 
     def setUp(self):
         super(TestClusterList, self).setUp()
@@ -52,6 +53,15 @@ class TestClusterList(TestClusters):
         self.cluster_client.list.assert_called_once_with(**self.defaults)
         self.assertEqual(self.columns, columns)
         self.assertEqual([self.values], data)
+
+    def test_cluster_list_health(self):
+        cluster = self.fake_clusters.get_clusters_cls_1234()
+        cluster.health = {'status': 'DEGRADED', 'members_out': ['m-2'],
+                          'reason': 'not answering: m-2'}
+        self.cluster_client.list.return_value = common.Paginated([cluster])
+        parsed_args = self.check_parser(self.cmd, [], [])
+        columns, data = self.cmd.take_action(parsed_args)
+        self.assertEqual('DEGRADED', data[0][columns.index('Health')])
 
 
 class TestClusterShow(TestClusters):
@@ -83,6 +93,18 @@ class TestClusterShow(TestClusters):
         columns, data = self.cmd.take_action(parsed_args)
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.values, data)
+
+    def test_show_health(self):
+        self.data._info['health'] = {
+            'status': 'DEGRADED', 'members_out': ['m-2', '10.0.0.3:6379'],
+            'reason': 'not answering: m-2', 'since': '2026-10-19T18:00:00'}
+        parsed_args = self.check_parser(self.cmd, ['cls-1234'], [])
+        columns, data = self.cmd.take_action(parsed_args)
+        shown = dict(zip(columns, data))
+        self.assertEqual('DEGRADED', shown['health'])
+        self.assertEqual('m-2, 10.0.0.3:6379', shown['health_members_out'])
+        self.assertEqual('not answering: m-2', shown['health_reason'])
+        self.assertEqual('2026-10-19T18:00:00', shown['health_since'])
 
 
 class TestDatabaseClusterDelete(TestClusters):
