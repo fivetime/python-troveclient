@@ -262,6 +262,20 @@ class TestDatabaseClusterUpgrade(TestClusters):
         self.assertIsNone(result)
 
 
+class TestDatabaseClusterRestart(TestClusters):
+
+    def setUp(self):
+        super(TestDatabaseClusterRestart, self).setUp()
+        self.cmd = database_clusters.RestartDatabaseCluster(self.app, None)
+
+    @mock.patch.object(utils, 'find_resource')
+    def test_cluster_restart(self, mock_find):
+        mock_find.return_value = 'cluster1'
+        parsed_args = self.check_parser(self.cmd, ['cluster1'], [])
+        self.assertIsNone(self.cmd.take_action(parsed_args))
+        self.cluster_client.restart.assert_called_with('cluster1')
+
+
 class TestDatabaseClusterResetCommunalCredential(TestClusters):
 
     def setUp(self):

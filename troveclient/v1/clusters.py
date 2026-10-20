@@ -139,6 +139,14 @@ class Clusters(base.ManagerWithFind):
         body = {"upgrade": {'datastore_version': datastore_version}}
         return self._action(cluster, body)
 
+    def restart(self, cluster):
+        """Restarts the members of a cluster one after another, in the
+        order its datastore chooses.
+
+        :param cluster: The cluster to restart
+        """
+        return self._action(cluster, {'restart': {}})
+
     def reset_communal_credential(self, cluster):
         """Gives the communal storage of a cluster an EC2 credential of the
         user asking, in place of the one it has (a Vertica cluster in Eon

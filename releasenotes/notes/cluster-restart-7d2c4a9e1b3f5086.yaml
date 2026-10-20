@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    ``openstack database cluster restart <cluster>`` restarts the members
+    of a cluster one after another, in the order its datastore chooses
+    (the ``restart`` cluster action).

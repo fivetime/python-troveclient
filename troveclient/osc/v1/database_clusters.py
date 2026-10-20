@@ -298,6 +298,27 @@ class UpgradeDatabaseCluster(command.Command):
         database_clusters.upgrade(cluster, parsed_args.datastore_version)
 
 
+class RestartDatabaseCluster(command.Command):
+
+    _description = _("Restarts the members of a cluster one after another, "
+                     "in the order its datastore chooses.")
+
+    def get_parser(self, prog_name):
+        parser = super(RestartDatabaseCluster, self).get_parser(prog_name)
+        parser.add_argument(
+            'cluster',
+            metavar='<cluster>',
+            help=_('ID or name of the cluster.'),
+        )
+        return parser
+
+    def take_action(self, parsed_args):
+        database_clusters = self.app.client_manager.database.clusters
+        cluster = utils.find_resource(database_clusters,
+                                      parsed_args.cluster)
+        database_clusters.restart(cluster)
+
+
 class ResetCommunalCredentialDatabaseCluster(command.Command):
 
     _description = _("Gives the communal storage of a cluster an EC2 "
