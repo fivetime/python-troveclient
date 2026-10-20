@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    ``openstack database cluster list instances`` shows a ``Role`` column
+    when the members tell their role in the cluster (the primary and the
+    secondaries of a Galera, Group Replication, PostgreSQL or MongoDB
+    cluster, the masters and replicas of a Redis cluster as they are
+    now).

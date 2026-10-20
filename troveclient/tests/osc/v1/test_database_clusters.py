@@ -10,6 +10,7 @@
 #   License for the specific language governing permissions and limitations
 #   under the License.
 
+import copy
 from unittest import mock
 
 from osc_lib import exceptions
@@ -95,6 +96,8 @@ class TestClusterShow(TestClusters):
         self.assertEqual(self.values, data)
 
     def test_show_health(self):
+        # The fake cluster is shared: a copy.
+        self.data._info = copy.deepcopy(self.data._info)
         self.data._info['health'] = {
             'status': 'DEGRADED', 'members_out': ['m-2', '10.0.0.3:6379'],
             'reason': 'not answering: m-2', 'since': '2026-10-19T18:00:00'}
@@ -227,6 +230,19 @@ class TestClusterListInstances(TestClusters):
         columns, data = self.cmd.take_action(parsed_args)
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.values, data)
+
+    def test_cluster_list_instances_with_roles(self):
+        # A Redis cluster after a failover: the replica is the master. The
+        # fake cluster is shared: a copy.
+        self.data._info = copy.deepcopy(self.data._info)
+        for instance, role in zip(self.data._info['instances'],
+                                  ('replica', 'master')):
+            instance['role'] = role
+        parsed_args = self.check_parser(self.cmd, ['cls-1234'], [])
+        columns, data = self.cmd.take_action(parsed_args)
+        self.assertEqual(self.columns + ['Role'], columns)
+        self.assertEqual([v + (r,) for v, r in zip(
+            self.values, ('replica', 'master'))], data)
 
 
 class TestDatabaseClusterUpgrade(TestClusters):

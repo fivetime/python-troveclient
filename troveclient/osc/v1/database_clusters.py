@@ -264,9 +264,13 @@ class ListDatabaseClusterInstances(command.Lister):
             if instance.get('volume'):
                 instance['size'] = instance['volume']['size']
 
-        instances = [utils.get_dict_properties(inst, self.columns)
+        columns = list(self.columns)
+        # The role each member has now, for the datastores that tell it.
+        if any(instance.get('role') for instance in instances):
+            columns.append('Role')
+        instances = [utils.get_dict_properties(inst, columns)
                      for inst in instances]
-        return self.columns, instances
+        return columns, instances
 
 
 class UpgradeDatabaseCluster(command.Command):
