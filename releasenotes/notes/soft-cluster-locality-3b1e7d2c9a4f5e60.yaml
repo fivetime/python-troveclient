@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    The database cluster create command now accepts the
+    ``soft-affinity`` and ``soft-anti-affinity`` locality policies, which
+    the cluster API takes since it validates the locality against the same
+    list as instances (a strict policy needs one host per member).

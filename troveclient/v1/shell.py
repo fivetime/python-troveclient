@@ -43,9 +43,9 @@ NIC_ERROR = _("Invalid NIC argument: %s. Must specify either net-id or port-id"
               " but not both. Please refer to help.")
 NO_LOG_FOUND_ERROR = _("ERROR: No published '%(log_name)s' log was found for "
                        "%(instance)s.")
-LOCALITY_DOMAIN = ['affinity', 'anti-affinity']
-INSTANCE_LOCALITY_DOMAIN = [
+LOCALITY_DOMAIN = [
     'affinity', 'soft-affinity', 'anti-affinity', 'soft-anti-affinity']
+INSTANCE_LOCALITY_DOMAIN = LOCALITY_DOMAIN
 EXT_PROPS_METAVAR = INSTANCE_METAVAR
 EXT_PROPS_HELP = _("Add extended properties for cluster create. "
                    "Currently only support MongoDB options, other databases "

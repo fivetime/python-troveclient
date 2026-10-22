@@ -193,6 +193,17 @@ class TestDatabaseClusterCreate(TestClusters):
         self.assertEqual(self.columns, columns)
         self.assertEqual(self.values, data)
 
+    def test_cluster_create_accepts_soft_locality(self):
+        for locality in ('soft-affinity', 'soft-anti-affinity'):
+            with self.subTest(locality=locality):
+                parsed_args = self.check_parser(
+                    self.cmd,
+                    ['test-name', 'vertica', '7.1',
+                     '--instance', 'flavor="02",volume=2',
+                     '--locality', locality],
+                    [('locality', locality)])
+                self.assertEqual(locality, parsed_args.locality)
+
 
 class TestDatabaseClusterResetStatus(TestClusters):
 

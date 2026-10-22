@@ -23,6 +23,7 @@ from troveclient.v1.shell import EXT_PROPS_HELP
 from troveclient.v1.shell import EXT_PROPS_METAVAR
 from troveclient.v1.shell import INSTANCE_HELP
 from troveclient.v1.shell import INSTANCE_METAVAR
+from troveclient.v1.shell import LOCALITY_DOMAIN
 
 
 def set_attributes_for_print_detail(cluster):
@@ -182,7 +183,7 @@ class CreateDatabaseCluster(command.ShowOne):
             '--locality',
             metavar='<policy>',
             default=None,
-            choices=['affinity', 'anti-affinity'],
+            choices=LOCALITY_DOMAIN,
             help=_('Locality policy to use when creating cluster. '
                    'Choose one of %(choices)s.'),
         )
