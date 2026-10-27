@@ -108,6 +108,29 @@ class TestClusterShow(TestClusters):
         self.assertEqual('m-2, 10.0.0.3:6379', shown['health_members_out'])
         self.assertEqual('not answering: m-2', shown['health_reason'])
         self.assertEqual('2026-10-19T18:00:00', shown['health_since'])
+        # A server that names no writers: no such lines.
+        self.assertNotIn('health_writers', shown)
+
+    def test_show_health_writers(self):
+        self.data._info = copy.deepcopy(self.data._info)
+        self.data._info['health'] = {
+            'status': 'HEALTHY', 'members_out': [], 'reason': None,
+            'since': '2026-10-27T00:15:15', 'writers': ['rs-member-2'],
+            'writer_changes': 1, 'writer_since': '2026-10-27T00:59:49'}
+        parsed_args = self.check_parser(self.cmd, ['cls-1234'], [])
+        columns, data = self.cmd.take_action(parsed_args)
+        shown = dict(zip(columns, data))
+        self.assertEqual(('rs-member-2', 1, '2026-10-27T00:59:49'),
+                         (shown['health_writers'],
+                          shown['health_writer_changes'],
+                          shown['health_writer_since']))
+        # In the middle of a failover none is named, the count stays.
+        self.data._info['health'] = dict(self.data._info['health'],
+                                         writers=[])
+        columns, data = self.cmd.take_action(parsed_args)
+        shown = dict(zip(columns, data))
+        self.assertEqual(('', 1), (shown['health_writers'],
+                                   shown['health_writer_changes']))
 
 
 class TestDatabaseClusterDelete(TestClusters):

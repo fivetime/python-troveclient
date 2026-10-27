@@ -45,6 +45,13 @@ def set_attributes_for_print_detail(cluster):
             info['health_reason'] = health['reason']
         if health.get('since'):
             info['health_since'] = health['since']
+        # Who takes the writes and how many times a member started to;
+        # nothing for a datastore that names no writers.
+        if health.get('writers') or health.get('writer_changes'):
+            info['health_writers'] = ', '.join(health.get('writers') or [])
+            info['health_writer_changes'] = health.get('writer_changes') or 0
+            if health.get('writer_since'):
+                info['health_writer_since'] = health['writer_since']
     if hasattr(cluster, 'ip'):
         ip = []
         for addr in cluster.ip:
